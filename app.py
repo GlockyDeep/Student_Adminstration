@@ -32,7 +32,7 @@ def login():
 def students():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    # Fetch students with their enrolled programs formatted as "code (name)"
+    # Fetch students with their enrolled programs
     cursor.execute("""
         SELECT s.*, 
                GROUP_CONCAT(CONCAT(p.program_code, ' (', p.program_name, ')')) as programs
@@ -63,7 +63,7 @@ def add_student():
     date_of_birth = request.form.get('date_of_birth')
     gender = request.form.get('gender')
     enrollment_date = request.form.get('enrollment_date')
-    program_id = request.form.get('program_id')  # Selected program
+    program_id = request.form.get('program_id')
 
     # Insert student
     cursor.execute(
@@ -77,8 +77,8 @@ def add_student():
 
     # Get the newly inserted student_id
     cursor.execute("SELECT LAST_INSERT_ID() as student_id")
+    
     student_id = cursor.fetchone()['student_id']
-
     # Insert enrollment if a program is selected
     if program_id:
         cursor.execute(
@@ -88,6 +88,74 @@ def add_student():
         db.commit()
 
     flash('Student added successfully')
+    return redirect(url_for('students'))
+
+# Students - Edit
+@app.route('/students/edit/<int:student_id>', methods=['GET', 'POST'])
+def edit_student(student_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Fetch student data
+    cursor.execute("SELECT * FROM students WHERE student_id = %s", (student_id,))
+    student = cursor.fetchone()
+    if not student:
+        flash('Student not found')
+        return redirect(url_for('students'))
+
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+
+        mobile_number = request.form.get('mobile_number')
+        address = request.form.get('address')
+        birthplace = request.form.get('birthplace')
+
+        date_of_birth = request.form.get('date_of_birth')
+        gender = request.form.get('gender')
+        enrollment_date = request.form.get('enrollment_date')
+
+        # Update student
+        cursor.execute(
+            """
+            UPDATE students 
+            SET first_name = %s, last_name = %s, email = %s,
+                mobile_number = %s, address = %s, birthplace = %s, 
+                date_of_birth = %s, gender = %s, enrollment_date = %s
+            WHERE student_id = %s
+            """,
+            (first_name, last_name, email, mobile_number, address, 
+             birthplace, date_of_birth or None, gender or None, 
+             enrollment_date or None, student_id)
+        )
+        db.commit()
+        flash('Student updated successfully')
+        return redirect(url_for('students'))
+
+    # Fetch all programs for the edit form
+    cursor.execute("SELECT * FROM programs")
+    programs = cursor.fetchall()
+    # Fetch enrolled programs for the student
+    cursor.execute("""
+        SELECT p.program_id 
+        FROM enrollments e 
+        JOIN programs p ON e.program_id = p.program_id 
+        WHERE e.student_id = %s
+    """, (student_id,))
+    enrolled_programs = [p['program_id'] for p in cursor.fetchall()]
+    
+    return render_template('edit_student.html', student=student, programs=programs, enrolled_programs=enrolled_programs)
+
+# Students - Delete
+@app.route('/students/delete/<int:student_id>', methods=['POST'])
+def delete_student(student_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    cursor.execute("DELETE FROM students WHERE student_id = %s", (student_id,))
+    db.commit()
+    flash('Student deleted successfully')
     return redirect(url_for('students'))
 
 # Logout
