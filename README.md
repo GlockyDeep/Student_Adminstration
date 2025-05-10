@@ -1,6 +1,20 @@
 # Student Enrollment and Management System
 
-This project is a simple Flask-based application for managing student enrollments. It allows users to log in, view a list of students, and add new students to the database.
+This project is a simple Flask-based web application for managing student enrollments. It allows an admin to log in, view, add, edit, and delete student records, including their enrolled programs, in a MySQL database. The application features a clean, responsive frontend built with Bootstrap and a lightweight Flask backend.
+
+## Features
+- **Admin Login**: Secure login for administrators using a username and password.
+
+- **Student Management** : View, add, edit, and delete student records with details like first name, last name, email, parent name, mobile number, address, birthplace, branch, date of birth, gender, enrollment date, and program enrollment.
+
+- **Program Enrollment** : Assign students to academic programs (e.g., CS101 (Computer Science)) via a dropdown menu.
+
+- **Responsive UI** : Built with Bootstrap for a modern, mobile-friendly interface.
+
+- **MySQL Integration** : Stores student, user, program, and enrollment data in a MySQL database.
+
+
+
 
 ## Prerequisites
 
@@ -36,12 +50,36 @@ CREATE DATABASE student_management;
 -- Switch to the newly created database
 USE student_management;
 
+-- Table for Programs
+CREATE TABLE programs (
+    program_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_name VARCHAR(100) NOT NULL,
+    program_code VARCHAR(10) UNIQUE NOT NULL
+);
+
 -- Table for Students
 CREATE TABLE students (
     student_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL
+    email VARCHAR(100) UNIQUE NOT NULL,
+    parent_name VARCHAR(100),
+    mobile_number VARCHAR(15),
+    address VARCHAR(255),
+    birthplace VARCHAR(100),
+    branch VARCHAR(50),
+    date_of_birth DATE,
+    gender ENUM('Male', 'Female', 'Other'),
+    enrollment_date DATE
+);
+
+-- Table for Enrollments
+CREATE TABLE enrollments (
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    program_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (program_id) REFERENCES programs(program_id)
 );
 
 -- Table for Admin Users
@@ -51,8 +89,13 @@ CREATE TABLE users (
     password VARCHAR(50) NOT NULL
 );
 
--- Insert a test admin user
+-- Insert test data
 INSERT INTO users (username, password) VALUES ('admin', 'admin123');
+INSERT INTO programs (program_name, program_code) VALUES 
+    ('Computer Science', 'CS101'),
+    ('Electrical Engineering', 'EE201'),
+    ('Information Science', 'IS301'),
+    ('Electronics', 'EL401');
 
 ```
 
