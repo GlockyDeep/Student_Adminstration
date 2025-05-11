@@ -1,19 +1,79 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="row justify-content-center">
+<head>
+    <style>
+        body{
+            height: 90vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #e9e3e3,#14c4be, #00000000);
+            background-size: cover;
+            text-align: center;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+
+        .container{
+            display: flex;
+            background: #e9e3e3;
+            width: 200px;
+            height: 300px;
+            border-radius: 20px;
+            max-width: 90%;
+            padding: 70px;
+            align-items: center;
+        }
+
+        h2{
+            font-size: 2rem;
+            margin-top: 1px;
+        }
+
+        button{
+            border: none;
+            width: 70px;
+            height: 35px;
+            background: #ffffff;
+            margin-top: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        button:hover{
+            background: #bdf2f0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2) ;
+        }
+
+        input::placeholder{
+            color:#000000;
+            font-family: sans-serif;
+        }
+
+        input{
+            border: none;
+            padding: 20px;
+            width: 200px;
+            height: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            
+        }
+
+    </style>
+</head>
+<div class="container">
     <div class="col-md-4">
         <h2 class="text-center mb-4">Login</h2>
         <form method="POST" action="{{ url_for('login') }}">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                <input type="text" class="input" id="username" name="username" placeholder="Username.." required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="input" id="password" name="password" placeholder="Password.." required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
     </div>
 </div>
-{% endblock %}
